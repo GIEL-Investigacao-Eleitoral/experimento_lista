@@ -20,6 +20,8 @@ list::predict.ictreg()
   
 data(affirm)
 data(race)
+summary(affirm)
+summary(race)
 
 # Conduct test with null hypothesis that there is no design effect
 # Replicates results on Blair and Imai (2012) pg. 69

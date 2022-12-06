@@ -1,0 +1,104 @@
+---
+title: "o experimento em lista"
+author: "GIEL"
+output:
+  word_document: 
+    reference_docx: Modelo.docx
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE,
+                      warning=FALSE,
+                      message=FALSE)
+```
+
+# Método: o experimento em lista
+
+Conduzimos o experimento de lista usando uma pesquisa de opinião no estado do Rio de Janeiro com eleitores fluminenses com idade de 16 anos ou mais. A pesquisa foi realizada no campo de XX a YY de outobro de 2022. 
+
+Conduzimos experimento de lista baseado na metodologia de (Ahlquist et. al. 2014). Estudamos aqui a relação entre favor/benefício do candidato em troca do voto.
+
+Durante a administração dos questionário, os entrevistados foram aleatoriamente designados para dois grupos, tratamento e controle, com igual probabilidade. Mem-
+Os membros do grupo de tratamento veem uma lista com cinco itens, enquanto os do grupo chamado de controle veem a lista de quatro itens.
+
+Os itens de controle de um a quatro são maneiras inócuas dos indivíduos indicarem o critério de escolha do candidatos durante a eleiçao. Entre elas, podemos destacar: a  coragem do candidato, as propostas dos candidatos, a religião do candidato, e a ideologia do candidato. No grupo de tratamento, os entrevistados podiam observar um quinto item: algum favor ou benefício que o candidato oferece em troca do voto.
+ 
+
+```{r}
+
+descricao <- tibble::tibble(
+Item=c('a','b','c','d','Tratamento'),
+`Indique o número de critérios`=c(
+	'A coragem do candidato',
+	'As propostas dos candidatos',
+	'A religião do candidato',
+	'A ideologia do candidato',
+	'Algum favor ou benefício que o candidato oferece em troca do voto'))
+
+library(flextable)
+ft <- flextable(descricao)
+
+#ft <- add_header_row(ft,
+#  colwidths = c(1, 1),
+#  values = c("Item", "Indique o número de critérios")
+#)
+ft <- theme_vanilla(ft)
+
+ft
+```
+ 
+# Análise de resultados: o experimento em lista
+ 
+Antes de desenvolver um modelo de regressão múltiplo ou um modelo não-linear, apresentamos nosso resultados básicos, isto é, criação de testes simples de diferença de médias em gráficos e exibições visuais. Já que na expectativa a única diferença entre as condições de tratamento e controle é a presença de um item adicional na lista, uma diferença nas médias fornece uma estimativa da prevalência do comportamento em questão na população alvo (dependendo do modo de coleta de dados .... validade externa? - conversar com o Felipe). Por exemplo, no experimento de lista, uma diferença média de 0,20 na representação do eleitor nos levaria a inferir que 20% dos eleitores aceitaria um favor ou benefício em troca do seu voto.
+
+A seguir mostramos a distribuição da quantidade de itens.
+
+
+```{r}
+library(janitor)
+banco %>% tabyl(Q14_3,experimento) %>%
+  adorn_percentages("col") %>% round(2) %>% flextable()
+
+```
+
+
+
+A figura 1 apresenta nossos principais resultados básicos. Esta figura mostra a diferença entre o grupos de tratamento e controle no número médio de itens relatados, juntamente com a associação intervalos de confiança de 95% via bootstrap (EFROM, 1974). Relatamos resultados para alguns subgrupos interessantes. 
+
+# INSERIR GGPLOT AQUI
+
+
+Test for List Experiment Design Effects
+
+Estimated population proportions 
+                           est.   s.e.
+pi(Y_i(0) = 0, Z_i = 1) -0.0101 0.0105
+pi(Y_i(0) = 1, Z_i = 1)  0.0293 0.0249
+pi(Y_i(0) = 2, Z_i = 1)  0.0619 0.0237
+pi(Y_i(0) = 3, Z_i = 1)  0.0169 0.0162
+pi(Y_i(0) = 4, Z_i = 1)  0.0317 0.0064
+pi(Y_i(0) = 0, Z_i = 0)  0.0489 0.0078
+pi(Y_i(0) = 1, Z_i = 0)  0.3329 0.0189
+pi(Y_i(0) = 2, Z_i = 0)  0.2550 0.0247
+pi(Y_i(0) = 3, Z_i = 0)  0.1603 0.0201
+pi(Y_i(0) = 4, Z_i = 0)  0.0730 0.0127
+
+ Y_i(0) is the (latent) count of 'yes' responses to the control items. Z_i is the (latent) binary response to the sensitive item.
+
+Bonferroni-corrected p-value
+If this value is below alpha, you reject the null hypothesis of no design effect. If it is above alpha, you fail to reject the null.
+
+Sensitive Item TRUE 
+          0.3341152 
+
+
+Olhando para o valor-p de Bonferroni de 0,334 (Bonferroni-corrected p-value), não há evidência consistente troca do voto do eleitor por vantagem ou benefício. A ideia de que o eleitor tem um comportamento generalizado escolha baseada por vantagem é totalmente contrariada por esses dados.
+
+Parece razoável imaginar que a troca por vantagem pode acontecer mais entre
+alguns grupos do que outros. Antes de passar para a análise de regressão, examinamos
+a diferença de médias em várias partições dos dados que podem ser relevantes.
+
+# INDICAR A ANALISE DO GGPLOT AQUI do IC 95% por idade e sexo, importância do voto, etc
+
+ 
+ 

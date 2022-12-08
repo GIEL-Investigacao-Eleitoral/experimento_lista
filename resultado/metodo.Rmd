@@ -61,9 +61,9 @@ ft
  
 # Análise de resultados: o experimento em lista
  
-Antes de desenvolver um modelo de regressão múltiplo ou um modelo não-linear, apresentamos nosso resultados básicos, isto é, criação de testes simples de diferença de médias em gráficos e exibições visuais. Já que na expectativa a única diferença entre as condições de tratamento e controle é a presença de um item adicional na lista, uma diferença nas médias fornece uma estimativa da prevalência do comportamento em questão na população alvo (dependendo do modo de coleta de dados .... validade externa? - conversar com o Felipe). Por exemplo, no experimento de lista, uma diferença média de 0,20 na representação do eleitor nos levaria a inferir que 20% dos eleitores aceitaria um favor ou benefício em troca do seu voto.
+Antes de desenvolver um modelo de regressão múltiplo ou um modelo não-linear, apresentamos nosso resultados básicos, isto é, criação de testes simples de diferença de médias em gráficos e exibições visuais. Já que na expectativa a única diferença entre as condições de tratamento e controle é a presença de um item adicional na lista, uma diferença nas médias fornece uma estimativa da prevalência do comportamento em questão na população alvo (dependendo do modo de coleta de dados .... validade externa? - conversar com o Felipe). Por exemplo, de acordo com Ahlquist (et.al. 2014) no experimento de lista, uma diferença média de 0,20 na representação do eleitor nos levaria a inferir que 20% dos eleitores aceitaria um favor ou benefício em troca do seu voto.
 
-A seguir mostramos a distribuição da quantidade de itens.
+De acordo com Gonzalez-Ocantos (et. al. 2012) e a diferença entre as duas médias indica uma estimativa pontual do número de pessoas relatando a troca de votos. Assim, se o número médio de itens for de 1,95 e o número médio no grupo de tratamento foi de 2,08 indica que 13% (2,08 - 1,95) dos respondentes informaram a troca de favor como critério.  A seguir mostramos a distribuição da quantidade de itens.
 
 
 ```{r}
@@ -74,6 +74,8 @@ banco %>% tabyl(Q14_3,experimento) %>%
 ```
 
 A figura 01 apresenta o resultado básico. Esta figura mostra a diferença entre o grupos de tratamento e controle no número médio de itens relatados pelos entrevistados, juntamente com a associação intervalos de confiança de 95%. 
+
+
 
 ```{r}
 library(ggplot2)
@@ -86,10 +88,9 @@ p+labs(x="Grupo", y = "Número médio de itens")+
 
 ```
 
+## Teste para efeitos de design de experiência de lista
 
-Test for List Experiment Design Effects
-
-Estimated population proportions 
+Proporções populacionais estimadas
 
 ```{r}
 Test_for_List_Experiment= tibble(P=c( 'pi(Y_i(0) = 0, Z_i = 1)',
@@ -108,18 +109,55 @@ erro_padrao=c(0.0105,0.0249,0.0237,0.0162,0.0064,0.0078,0.0189,0.0247,0.0201,0.0
 
 Test_for_List_Experiment
 ```
-Onde Y_i(0) é a contagem (latente) de respostas 'sim' aos itens de controle. Z_i é a resposta binária (latente) ao item sensível.
+Onde Y_i(0) é a contagem (latente) de respostas 'sim' aos itens de controle. Z_i é a resposta binária (latente) ao item sensível. (RETIRAR AS ESTIMATIVAS DE PROPORÇÕES DE CADA ITEM - COLOCAR SOMENTE O p-valor de Bonferroni)
 
 Valor-p (pvalor) corrigido por Bonferroni =  0,3341152 
 
 
 Olhando para o valor-p de Bonferroni de 0,334 (Bonferroni-corrected p-value), não há evidência consistente troca do voto do eleitor por vantagem ou benefício. A ideia de que o eleitor tem um comportamento generalizado escolha baseada por vantagem é totalmente contrariada por esses dados.
 
-Parece razoável imaginar que a troca por vantagem pode acontecer mais entre
-alguns grupos do que outros. Antes de passar para a análise de regressão, examinamos
-a diferença de médias em várias partições dos dados que podem ser relevantes.
+Esses resultados indicam estar relacionados com a Q9 e Q10.
+>Q9  - O(A) sr(a) conhece alguém  que já trocou o voto por um favor ou benefício que recebeu de algum candidato?
+
+```{r}
+prop.table(table(banco$Q9)) %>% data.frame() %>% rename(Resposta=Var1,Proporção=Freq)
+
+```
+
+>Q10 - O(A) sr(a) já trocou o voto por um favor ou benefício que recebeu de algum candidato? 
+
+```{r}
+prop.table(table(banco$Q10)) %>% data.frame() %>% rename(Resposta=Var1,Proporção=Freq)
+```
+
+
+Parece razoável imaginar que a troca por vantagem pode acontecer mais entre alguns grupos do que outros. Antes de passar para a análise de regressão, examinamos a diferença de médias em várias partições dos dados que podem ser relevantes.
 
 # INDICAR A ANALISE DO GGPLOT AQUI do IC 95% por idade e sexo, importância do voto, etc
 
+# INDICAR A ANALISE DO Item Count Technique Regression 
+
+Item Count Technique Regression 
+Call: ictreg(formula = y ~ 1, data = banco_reduzido, treat = "treat", 
+    J = 4, method = "lm")
+Sensitive item 
+               Est.   S.E.
+(Intercept) 0.12976 0.0572
+Control items 
+               Est.    S.E.
+(Intercept) 1.94696 0.03796
+Residual standard error: 1.11617 with 1527 degrees of freedom
+Number of control items J set to 4. 
  
- 
+# INDICAR A ANALISE DO Item Count Technique Regression por idade e sexo
+idade está no limiar da significancia estatística
+sexo não é significativo
+
+Fazer o Q5 - Qual o grau de importância ao voto 
+Q8  - confiança na urna 
+Q20 - covid?
+Q28 - ideologia
+Q29 bolsa familia e auxiliobrasil
+v5 educa
+v3 cor
+

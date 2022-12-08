@@ -93,7 +93,6 @@ lm.results <- ictreg(y ~ idade + as.factor(sexo), data = banco_reduzido,
                      treat = "treat", J=4, method = "lm")
 summary(lm.results)
 # Fit two-step non-linear least squares regression
-# Replicates Table 1 Columns 3-4 Imai (2011); note that age is divided by 10
 nls.results <- ictreg(y ~ idade + as.factor(sexo), data = banco_reduzido, 
                       treat = "treat", J=4, method = "nls")
 summary(nls.results)

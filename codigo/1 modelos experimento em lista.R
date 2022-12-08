@@ -17,7 +17,6 @@ dicionario[33,] # lista 1 + lista 2
 
 max(banco$Q14_1, na.rm = T)
 max(banco$Q14_2, na.rm = T)
-
 mean(banco$Q14_1, na.rm = T)
 mean(banco$Q14_2, na.rm = T)
 
@@ -28,7 +27,6 @@ sum(is.na(banco$Q14_3))
 #define standard error of mean function
 erro_padrao <- function(x) sd(x)/sqrt(length(x))
 tabela_medias = banco %>% group_by(experimento) %>% summarise(media=mean(Q14_3),erro_padrao=erro_padrao(Q14_3))
-tabela_medias = as.data.frame(tibble(tabela_medias))
 tabela_medias$experimento <- haven::as_factor(tabela_medias$experimento)
 
 # http://www.sthda.com/english/wiki/ggplot2-error-bars-quick-start-guide-r-software-and-data-visualization
@@ -42,6 +40,7 @@ p+labs(x="Grupo", y = "Número médio de itens")+
 
 # banco %>% group_by(experimento) %>% table(banco$Q14_3)
 library(janitor)
+library(flextable)
 banco %>% tabyl(Q14_3,experimento) %>%
   adorn_percentages("col") %>% round(2) %>% flextable()
 
@@ -52,7 +51,6 @@ banco %>% group_by(experimento2) %>% summarise(media=mean(Q14_3))
 banco %>% group_by(experimento3) %>% summarise(media=mean(Q14_3))
 
 table(banco$experimento)
-
 #-----------------------------------------------------------------------
 #-----------------------------------------------------------------------
 #-----------------------------------------------------------------------
@@ -67,7 +65,6 @@ teste2 <- ict.test(banco$Q14_3, banco$experimento2, J = 4, gms = FALSE)
 print(teste2)
 
 #gms	= A logical value indicating whether the generalized moment selection procedure should be used.
-
 teste <- ict.test(banco$Q14_3, banco$experimento2, J = 4, gms = TRUE,pi.table	=TRUE,n.draws=50000)
 print(teste)
 

@@ -10,6 +10,20 @@ output:
 knitr::opts_chunk$set(echo = FALSE,
                       warning=FALSE,
                       message=FALSE)
+
+#-----------------------------------------------------
+#                    Carregar
+#-----------------------------------------------------
+library(dplyr)
+library(haven)
+load("/home/steven/Área de Trabalho/CCJP/Borba/experimento_lista/BD_Covid_Faperj.RData")
+
+#define standard error of mean function
+erro_padrao <- function(x) sd(x)/sqrt(length(x))
+
+banco$experimento2 = ifelse(is.na(banco$Q14_2),FALSE,TRUE)
+banco$experimento3 = ifelse(banco$experimento2==T,1,0)
+
 ```
 
 # Método: o experimento em lista
@@ -22,10 +36,8 @@ Durante a administração dos questionário, os entrevistados foram aleatoriamen
 Os membros do grupo de tratamento veem uma lista com cinco itens, enquanto os do grupo chamado de controle veem a lista de quatro itens.
 
 Os itens de controle de um a quatro são maneiras inócuas dos indivíduos indicarem o critério de escolha do candidatos durante a eleiçao. Entre elas, podemos destacar: a  coragem do candidato, as propostas dos candidatos, a religião do candidato, e a ideologia do candidato. No grupo de tratamento, os entrevistados podiam observar um quinto item: algum favor ou benefício que o candidato oferece em troca do voto.
- 
 
 ```{r}
-
 descricao <- tibble::tibble(
 Item=c('a','b','c','d','Tratamento'),
 `Indique o número de critérios`=c(
@@ -61,35 +73,44 @@ banco %>% tabyl(Q14_3,experimento) %>%
 
 ```
 
+A figura 01 apresenta o resultado básico. Esta figura mostra a diferença entre o grupos de tratamento e controle no número médio de itens relatados pelos entrevistados, juntamente com a associação intervalos de confiança de 95%. 
 
+```{r}
+library(ggplot2)
+p<- ggplot(tabela_medias, aes(x=experimento, y=media, color=experimento)) + 
+  geom_pointrange(aes(ymin=media-1.96*erro_padrao, ymax=media+1.96*erro_padrao))
 
-A figura 1 apresenta nossos principais resultados básicos. Esta figura mostra a diferença entre o grupos de tratamento e controle no número médio de itens relatados, juntamente com a associação intervalos de confiança de 95% via bootstrap (EFROM, 1974). Relatamos resultados para alguns subgrupos interessantes. 
+p+labs(x="Grupo", y = "Número médio de itens")+
+  theme_classic() +
+  scale_color_manual(values=c('#999999','#E69F00'))
 
-# INSERIR GGPLOT AQUI
+```
 
 
 Test for List Experiment Design Effects
 
 Estimated population proportions 
-                           est.   s.e.
-pi(Y_i(0) = 0, Z_i = 1) -0.0101 0.0105
-pi(Y_i(0) = 1, Z_i = 1)  0.0293 0.0249
-pi(Y_i(0) = 2, Z_i = 1)  0.0619 0.0237
-pi(Y_i(0) = 3, Z_i = 1)  0.0169 0.0162
-pi(Y_i(0) = 4, Z_i = 1)  0.0317 0.0064
-pi(Y_i(0) = 0, Z_i = 0)  0.0489 0.0078
-pi(Y_i(0) = 1, Z_i = 0)  0.3329 0.0189
-pi(Y_i(0) = 2, Z_i = 0)  0.2550 0.0247
-pi(Y_i(0) = 3, Z_i = 0)  0.1603 0.0201
-pi(Y_i(0) = 4, Z_i = 0)  0.0730 0.0127
 
- Y_i(0) is the (latent) count of 'yes' responses to the control items. Z_i is the (latent) binary response to the sensitive item.
+```{r}
+Test_for_List_Experiment= tibble(P=c( 'pi(Y_i(0) = 0, Z_i = 1)',
+'pi(Y_i(0) = 1, Z_i = 1)',
+'pi(Y_i(0) = 2, Z_i = 1)',
+'pi(Y_i(0) = 3, Z_i = 1)',
+'pi(Y_i(0) = 4, Z_i = 1)',
+'pi(Y_i(0) = 0, Z_i = 0)',
+'pi(Y_i(0) = 1, Z_i = 0)',
+'pi(Y_i(0) = 2, Z_i = 0)',
+'pi(Y_i(0) = 3, Z_i = 0)',
+'pi(Y_i(0) = 4, Z_i = 0)'
+),
+estimativa=c(-0.0101,0.0293,0.0619,0.0169,0.0317,0.0489,0.3329,0.255,0.1603,0.073),
+erro_padrao=c(0.0105,0.0249,0.0237,0.0162,0.0064,0.0078,0.0189,0.0247,0.0201,0.0127))
 
-Bonferroni-corrected p-value
-If this value is below alpha, you reject the null hypothesis of no design effect. If it is above alpha, you fail to reject the null.
+Test_for_List_Experiment
+```
+Onde Y_i(0) é a contagem (latente) de respostas 'sim' aos itens de controle. Z_i é a resposta binária (latente) ao item sensível.
 
-Sensitive Item TRUE 
-          0.3341152 
+Valor-p (pvalor) corrigido por Bonferroni =  0,3341152 
 
 
 Olhando para o valor-p de Bonferroni de 0,334 (Bonferroni-corrected p-value), não há evidência consistente troca do voto do eleitor por vantagem ou benefício. A ideia de que o eleitor tem um comportamento generalizado escolha baseada por vantagem é totalmente contrariada por esses dados.

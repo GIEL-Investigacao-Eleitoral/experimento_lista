@@ -32,8 +32,7 @@ Conduzimos o experimento de lista usando uma pesquisa de opinião no estado do R
 
 Conduzimos experimento de lista baseado na metodologia de (Ahlquist et. al. 2014). Estudamos aqui a relação entre favor/benefício do candidato em troca do voto.
 
-Durante a administração dos questionário, os entrevistados foram aleatoriamente designados para dois grupos, tratamento e controle, com igual probabilidade. Mem-
-Os membros do grupo de tratamento veem uma lista com cinco itens, enquanto os do grupo chamado de controle veem a lista de quatro itens.
+Durante a administração dos questionário, os entrevistados foram aleatoriamente designados para dois grupos, tratamento e controle, com igual probabilidade. Os membros do grupo de tratamento veem uma lista com cinco itens, enquanto os do grupo chamado de controle veem a lista de quatro itens.
 
 Os itens de controle de um a quatro são maneiras inócuas dos indivíduos indicarem o critério de escolha do candidatos durante a eleiçao. Entre elas, podemos destacar: a  coragem do candidato, as propostas dos candidatos, a religião do candidato, e a ideologia do candidato. No grupo de tratamento, os entrevistados podiam observar um quinto item: algum favor ou benefício que o candidato oferece em troca do voto.
 
@@ -61,9 +60,9 @@ ft
  
 # Análise de resultados: o experimento em lista
  
-Antes de desenvolver um modelo de regressão múltiplo ou um modelo não-linear, apresentamos nosso resultados básicos, isto é, criação de testes simples de diferença de médias em gráficos e exibições visuais. Já que na expectativa a única diferença entre as condições de tratamento e controle é a presença de um item adicional na lista, uma diferença nas médias fornece uma estimativa da prevalência do comportamento em questão na população alvo (dependendo do modo de coleta de dados .... validade externa? - conversar com o Felipe). Por exemplo, de acordo com Ahlquist (et.al. 2014) no experimento de lista, uma diferença média de 0,20 na representação do eleitor nos levaria a inferir que 20% dos eleitores aceitaria um favor ou benefício em troca do seu voto.
+Antes de desenvolver um modelo de regressão múltipla ou um modelo não-linear, apresentamos os resultados básicos, isto é, criação de testes simples de diferença de médias em gráficos e em visualização de dados. Já que na expectativa a única diferença entre as condições de tratamento e controle é a presença de um item adicional na lista, uma diferença nas médias fornece uma estimativa da prevalência do comportamento em questão na população alvo (dependendo do modo de coleta de dados .... validade externa? - conversar com o Felipe). Por exemplo, de acordo com Ahlquist (et.al. 2014) no experimento de lista, uma diferença média de 0,20 na representação do eleitor nos levaria a inferir que 20% dos eleitores aceitaria um favor ou benefício em troca do seu voto.
 
-De acordo com Gonzalez-Ocantos (et. al. 2012) e a diferença entre as duas médias indica uma estimativa pontual do número de pessoas relatando a troca de votos. Assim, se o número médio de itens for de 1,95 e o número médio no grupo de tratamento foi de 2,08 indica que 13% (2,08 - 1,95) dos respondentes informaram a troca de favor como critério.  A seguir mostramos a distribuição da quantidade de itens.
+De acordo com Gonzalez-Ocantos (et. al. 2012), a diferença entre as duas médias indica uma estimativa pontual do número de pessoas relatando a troca de votos. Assim, se o número médio de itens for de 1,95 e o número médio no grupo de tratamento foi de 2,08 indica que 13% (2,08 - 1,95) dos respondentes informaram a troca de favor como critério.  A seguir mostramos a distribuição da quantidade de itens.
 
 
 ```{r}
@@ -78,6 +77,10 @@ A figura 01 apresenta o resultado básico. Esta figura mostra a diferença entre
 
 
 ```{r}
+#define standard error of mean function
+erro_padrao <- function(x) sd(x)/sqrt(length(x))
+tabela_medias = banco %>% group_by(experimento) %>% summarise(media=mean(Q14_3),erro_padrao=erro_padrao(Q14_3))
+tabela_medias$experimento <- haven::as_factor(tabela_medias$experimento)
 library(ggplot2)
 p<- ggplot(tabela_medias, aes(x=experimento, y=media, color=experimento)) + 
   geom_pointrange(aes(ymin=media-1.96*erro_padrao, ymax=media+1.96*erro_padrao))
@@ -114,9 +117,10 @@ Onde Y_i(0) é a contagem (latente) de respostas 'sim' aos itens de controle. Z_
 Valor-p (pvalor) corrigido por Bonferroni =  0,3341152 
 
 
-Olhando para o valor-p de Bonferroni de 0,334 (Bonferroni-corrected p-value), não há evidência consistente troca do voto do eleitor por vantagem ou benefício. A ideia de que o eleitor tem um comportamento generalizado escolha baseada por vantagem é totalmente contrariada por esses dados.
+Olhando para o valor-p de Bonferroni de 0,334 (Bonferroni-corrected p-value), não há evidência consistente troca do voto do eleitor por vantagem ou benefício. A ideia de que o eleitor tem um comportamento generalizado de escolha baseada por vantagem é totalmente contrariada por esses dados.
 
-Esses resultados indicam estar relacionados com a Q9 e Q10.
+Esses resultados estão relacionados com a Q9 e Q10.
+
 >Q9  - O(A) sr(a) conhece alguém  que já trocou o voto por um favor ou benefício que recebeu de algum candidato?
 
 ```{r}

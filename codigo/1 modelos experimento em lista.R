@@ -45,6 +45,9 @@ banco %>% tabyl(Q14_3,experimento) %>%
   adorn_percentages("col") %>% round(2) %>% flextable()
 
 
+#----------------------------------------------------------------
+
+# preparando o banco para o pacote 'list'
 banco$experimento2 = ifelse(is.na(banco$Q14_2),FALSE,TRUE)
 banco$experimento3 = ifelse(banco$experimento2==T,1,0)
 banco %>% group_by(experimento2) %>% summarise(media=mean(Q14_3))
@@ -67,17 +70,46 @@ print(teste2)
 #gms	= A logical value indicating whether the generalized moment selection procedure should be used.
 teste <- ict.test(banco$Q14_3, banco$experimento2, J = 4, gms = TRUE,pi.table	=TRUE,n.draws=50000)
 print(teste)
-
-
 banco$Q14_3 <- as.numeric(banco$Q14_3)
 
-banco_reduzido = banco %>% select(Q14_3, experimento3,Idade_Exata,v2)
+#----------------------------------------------------------------------
+# incluindo as covariaveis
+# sexo, idade, escolaridade, confianca na urna e ideologia
+#----------------------------------------------------------------------
+banco = tibble(banco)
+banco$Q28 = as.factor(banco$Q28)
+banco$Q28 = ifelse(banco$Q28=='99',NA,banco$Q28)
+banco$Q28 = ifelse(banco$Q28=='6',NA,banco$Q28)
+banco$Q28 = ifelse(banco$Q28=='1','Esquerda',banco$Q28)
+banco$Q28 = ifelse(banco$Q28=='2','Centro-esquerda',banco$Q28)
+banco$Q28 = ifelse(banco$Q28=='3','Centro',banco$Q28)
+banco$Q28 = ifelse(banco$Q28=='4','Centro-direita',banco$Q28)
+banco$Q28 = ifelse(banco$Q28=='5','Direita',banco$Q28)
+table(banco$Q28)
+
+banco$v5 = as.factor(banco$v5)
+banco$v5 = ifelse(banco$v5=='1','1 Até o fundamental completo',banco$v5)
+banco$v5 = ifelse(banco$v5=='2','1 Até o fundamental completo',banco$v5)
+banco$v5 = ifelse(banco$v5=='3','1 Até o fundamental completo',banco$v5)
+banco$v5 = ifelse(banco$v5=='4','1 Até o fundamental completo',banco$v5)
+banco$v5 = ifelse(banco$v5=='5','2 Ensino médio completo',banco$v5)
+banco$v5 = ifelse(banco$v5=='6','3 Superior completo',banco$v5)
+banco$v5 = ifelse(banco$v5=='7','3 Superior completo',banco$v5)
+
+banco$Q8 = as.factor(banco$Q8)
+banco$Q8 = ifelse(banco$Q8=='1','1.Muita confiança',banco$Q8)
+banco$Q8 = ifelse(banco$Q8=='2','2.Pouca confiança',banco$Q8)
+banco$Q8 = ifelse(banco$Q8=='3','3.Nenhuma confiança',banco$Q8)
+banco$Q8 = ifelse(banco$Q8=='4',NA,banco$Q8)
+table(banco$Q8)
+
+banco_reduzido = banco %>% select(Q14_3, experimento3,Idade_Exata,v2,Q28,v5,Q8)
 banco_reduzido = na.omit(banco_reduzido)
 # Tem que ser um data.frame para funcionar
 # Não pode ser um tibble nem um spss
 banco_reduzido = data.frame(banco_reduzido)
-colnames(banco_reduzido) = c('y','treat','idade','sexo')
-
+colnames(banco_reduzido) = c('y','treat','idade','sexo','ideologia','educa','confia_urna')
+colnames(banco_reduzido) 
 # Calculate list experiment difference in means
 diff_medias <- ictreg(y ~ 1, data = banco_reduzido, 
                      treat = "treat", J=4, method = "lm")
@@ -89,9 +121,27 @@ aaa
 
 #----------------------------------------------------------------------------------------
 # Fit linear regression
-lm.results <- ictreg(y ~ idade + as.factor(sexo), data = banco_reduzido, 
+lm.results <- ictreg(y ~ idade + as.factor(sexo)+ideologia+educa+confia_urna, data = banco_reduzido, 
                      treat = "treat", J=4, method = "lm")
 summary(lm.results)
+
+#a estatística de teste para um teste Z tem a distribuição normal padrão sob a hipótese nula. 
+#Suponha que você execute um teste Z de duas caudas com um α de 0,05,
+#e obtenha uma estatística Z com base em seus dados de 2,5. 
+#Este valor Z corresponde a um valor-p de 0,0124. 
+#2*pnorm(2.5,lower.tail = FALSE)
+
+#Este valor é 2 vezes a probabilidade de que o teste estatístico não assume um valor igual a ou maior que o valor absoluto do referido valor realmente observado com base na sua amostra (sob H0). 
+#2* P(TS > |1,785|) = 2 * 0,0371 = 0,0742. Por isso o valor de p = 0,0742. 
+#2*pnorm(1.785,lower.tail = FALSE) # (1-pnorm(1.785))*2
+
+#2*Pr(ET>|−2.14/1.08|) = 2*Pr(ET>|-1.981481|)= 2*Pr(ET>1.981481)
+
+#ET = 2.14/1.08
+#2*pnorm(ET,lower.tail = FALSE)
+#2*pt(ET, df=20, lower.tail = FALSE, log.p = FALSE)
+
+
 # Fit two-step non-linear least squares regression
 nls.results <- ictreg(y ~ idade + as.factor(sexo), data = banco_reduzido, 
                       treat = "treat", J=4, method = "nls")

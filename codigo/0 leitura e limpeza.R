@@ -2,7 +2,7 @@
 
 library(dplyr)
 library(haven)
-banco <- read_spss("/home/steven/Área de Trabalho/CCJP/Borba/experimento_lista/BD Covid-Faperj(1).sav")
+banco <- haven::read_spss("/home/steven/Área de Trabalho/CCJP/Borba/experimento_lista/BD Covid-Faperj(1).sav")
 
 # criacao do dicionario de dados
 nomes<-names(banco)
@@ -58,6 +58,26 @@ haven::print_labels(banco$FILTRO_PROFISSÃO)
 
 haven::print_labels(banco$FILIAÇÃO)
 
+haven::print_labels(banco$Q8)
+haven::print_labels(banco$v5)
+haven::print_labels(banco$Q28)
+
+#1   Muita confiança
+#2   Pouca confiança
+#3 Nenhuma confiança
+#99          Não sabe
+
+#Q8  - confiança na urna 
+#v5 educa
+#Q28 - ideologia
+#value           label
+#1        Esquerda
+#2 Centro-esquerda
+#3          Centro
+#4  Centro-direita
+#5         Direita
+#96         Nenhuma
+#99        Não sabe
 
 
 

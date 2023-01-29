@@ -16,7 +16,9 @@ knitr::opts_chunk$set(echo = FALSE,
 #-----------------------------------------------------
 library(dplyr)
 library(haven)
-load("/home/steven/Área de Trabalho/CCJP/Borba/experimento_lista/BD_Covid_Faperj.RData")
+# load("/home/steven/Área de Trabalho/CCJP/Borba/experimento_lista/BD_Covid_Faperj.RData")
+
+load("C:/Users/Hp/Google Drive (steven.ross@uniriotec.br)/CCJP/Borba/02 novembro de 2022 experimento de lista/banco/BD_Covid_Faperj.RData")
 
 #define standard error of mean function
 erro_padrao <- function(x) sd(x)/sqrt(length(x))
@@ -137,31 +139,22 @@ prop.table(table(banco$Q10)) %>% data.frame() %>% rename(Resposta=Var1,Proporç�
 
 Parece razoável imaginar que a troca por vantagem pode acontecer mais entre alguns grupos do que outros. Antes de passar para a análise de regressão, examinamos a diferença de médias em várias partições dos dados que podem ser relevantes.
 
+```{r,echo=FALSE,eval=FALSE}
 # INDICAR A ANALISE DO GGPLOT AQUI do IC 95% por idade e sexo, importância do voto, etc
 
-# INDICAR A ANALISE DO Item Count Technique Regression 
-
-Item Count Technique Regression 
-Call: ictreg(formula = y ~ 1, data = banco_reduzido, treat = "treat", 
-    J = 4, method = "lm")
-Sensitive item 
-               Est.   S.E.
-(Intercept) 0.12976 0.0572
-Control items 
-               Est.    S.E.
-(Intercept) 1.94696 0.03796
-Residual standard error: 1.11617 with 1527 degrees of freedom
-Number of control items J set to 4. 
- 
 # INDICAR A ANALISE DO Item Count Technique Regression por idade e sexo
-idade está no limiar da significancia estatística
-sexo não é significativo
+#idade está no limiar da significancia estatística
+#sexo não é significativo
 
-Fazer o Q5 - Qual o grau de importância ao voto 
-Q8  - confiança na urna 
-Q20 - covid?
-Q28 - ideologia
-Q29 bolsa familia e auxiliobrasil
-v5 educa
-v3 cor
+#Fazer o Q5 - Qual o grau de importância ao voto 
+#Q8  - confiança na urna 
+#Q20 - covid?
+#Q28 - ideologia
+#Q29 bolsa familia e auxiliobrasil
+#v5 educa
+#v3 cor
+
+
+
+```
 

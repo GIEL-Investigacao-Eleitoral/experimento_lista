@@ -79,9 +79,10 @@ haven::print_labels(banco$Q28)
 #96         Nenhuma
 #99        Não sabe
 
+haven::print_labels(banco$Q5)
 
 
-
+haven::print_labels(banco$sexo)
 
 
 

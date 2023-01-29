@@ -5,6 +5,7 @@
 library(dplyr)
 library(haven)
 load("/home/steven/Área de Trabalho/CCJP/Borba/experimento_lista/BD_Covid_Faperj.RData")
+load("C:/Users/Hp/Google Drive (steven.ross@uniriotec.br)/CCJP/Borba/02 novembro de 2022 experimento de lista/banco/BD_Covid_Faperj.RData")
 #------------------------------------------------------------------------------
 #           Variavel resposta
 #------------------------------------------------------------------------------
@@ -103,12 +104,21 @@ banco$Q8 = ifelse(banco$Q8=='3','3.Nenhuma confiança',banco$Q8)
 banco$Q8 = ifelse(banco$Q8=='4',NA,banco$Q8)
 table(banco$Q8)
 
-banco_reduzido = banco %>% select(Q14_3, experimento3,Idade_Exata,v2,Q28,v5,Q8)
+banco$Q5 = as.factor(banco$Q5)
+banco$Q5 = ifelse(banco$Q5=='1','1.Muito importante',banco$Q5)
+banco$Q5 = ifelse(banco$Q5=='2','2.Pouco importante',banco$Q5)
+banco$Q5 = ifelse(banco$Q5=='3','3.Nada importante',banco$Q5)
+banco$Q5 = ifelse(banco$Q5=='4',NA,banco$Q5)
+table(banco$Q5)
+
+
+
+banco_reduzido = banco %>% select(Q14_3, experimento3,Idade_Exata,v2,Q28,v5,Q8,Q5)
 banco_reduzido = na.omit(banco_reduzido)
 # Tem que ser um data.frame para funcionar
 # Não pode ser um tibble nem um spss
 banco_reduzido = data.frame(banco_reduzido)
-colnames(banco_reduzido) = c('y','treat','idade','sexo','ideologia','educa','confia_urna')
+colnames(banco_reduzido) = c('y','treat','idade','sexo','ideologia','educa','confia_urna','importância_voto')
 colnames(banco_reduzido) 
 # Calculate list experiment difference in means
 diff_medias <- ictreg(y ~ 1, data = banco_reduzido, 
@@ -121,9 +131,25 @@ aaa
 
 #----------------------------------------------------------------------------------------
 # Fit linear regression
-lm.results <- ictreg(y ~ idade + as.factor(sexo)+ideologia+educa+confia_urna, data = banco_reduzido, 
+modelo_simples <- ictreg(y ~ idade + as.factor(sexo), data = banco_reduzido, 
+                     treat = "treat", J=4, method = "lm")
+summary(modelo_simples)
+
+modelo_intermediario1 <- ictreg(y ~ idade + as.factor(sexo)+educa, data = banco_reduzido, 
+                     treat = "treat", J=4, method = "lm")
+summary(modelo_intermediario1)
+
+modelo_intermediario2 <- ictreg(y ~ idade + as.factor(sexo)+educa+ideologia, data = banco_reduzido, 
+                     treat = "treat", J=4, method = "lm")
+summary(modelo_intermediario2)
+
+lm.results <- ictreg(y ~ idade + as.factor(sexo)+ideologia+educa+confia_urna+importância_voto, data = banco_reduzido, 
                      treat = "treat", J=4, method = "lm")
 summary(lm.results)
+
+
+
+
 
 #a estatística de teste para um teste Z tem a distribuição normal padrão sob a hipótese nula. 
 #Suponha que você execute um teste Z de duas caudas com um α de 0,05,
@@ -135,11 +161,26 @@ summary(lm.results)
 #2* P(TS > |1,785|) = 2 * 0,0371 = 0,0742. Por isso o valor de p = 0,0742. 
 #2*pnorm(1.785,lower.tail = FALSE) # (1-pnorm(1.785))*2
 
-#2*Pr(ET>|−2.14/1.08|) = 2*Pr(ET>|-1.981481|)= 2*Pr(ET>1.981481)
+# 2*Pr(ET>|−2.14/1.08|) = 2*Pr(ET>|-1.981481|)= 2*Pr(ET>1.981481)
 
 #ET = 2.14/1.08
 #2*pnorm(ET,lower.tail = FALSE)
 #2*pt(ET, df=20, lower.tail = FALSE, log.p = FALSE)
+
+
+table(banco$experimento2)
+banco_reduzido %>% group_by(treat,importância_voto) %>% summarise(media=mean(y))
+banco_reduzido %>% group_by(treat,educa) %>% summarise(media=mean(y))
+banco_reduzido %>% group_by(treat,idade) %>% summarise(media=mean(y))
+
+
+
+
+
+
+
+
+
 
 
 # Fit two-step non-linear least squares regression

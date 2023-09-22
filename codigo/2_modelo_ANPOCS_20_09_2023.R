@@ -20,16 +20,14 @@ haven::print_labels(banco$Q5)
 haven::print_labels(banco$Q6)
 haven::print_labels(banco$Q7)
 haven::print_labels(banco$Q8)
-ideologia2
-
+haven::print_labels(banco$ideologia2)
 
 banco = banco %>% filter(ideologia2!=99)
 banco = banco %>% filter(Q8!=99)
 banco = banco %>% filter(Q7!=99)
 banco = banco %>% filter(Q5!=99)
+banco = banco %>% filter(ideologia2!=99)
 
-
-#--------------------------------------------------------------------------------------
 
 #-----------------------------------------------------------------------
 #-----------------------------------------------------------------------
@@ -47,10 +45,8 @@ table(banco$experimento)
 # Conduct test with null hypothesis that there is no design effect
 teste <- ict.test(banco$Q14_3, banco$experimento2, J = 4, gms = TRUE)
 print(teste)
-
 teste2 <- ict.test(banco$Q14_3, banco$experimento2, J = 4, gms = FALSE)
 print(teste2)
-
 #gms	= A logical value indicating whether the generalized moment selection procedure should be used.
 teste <- ict.test(banco$Q14_3, banco$experimento2, J = 4, gms = TRUE,pi.table	=TRUE,n.draws=50000)
 print(teste)
@@ -73,7 +69,7 @@ haven::print_labels(banco$Q5)
 haven::print_labels(banco$Q6)
 haven::print_labels(banco$Q7)
 haven::print_labels(banco$Q8)
-ideologia2
+haven::print_labels(banco$ideologia2)
 
 banco_reduzido = banco %>% select(Q14_3, experimento2,
                                   # Sociais
@@ -119,7 +115,6 @@ banco_reduzido = banco_reduzido %>%
       renda2==4     ~ "Mais de 10"))
 table(banco_reduzido$renda2)
 
-
 banco_reduzido = banco_reduzido %>%
   mutate(
     religião2 = case_when(
@@ -128,7 +123,6 @@ banco_reduzido = banco_reduzido %>%
       religião2==3     ~ "Outras religiões",
       religião2==4     ~ "Sem religião"))
 table(banco_reduzido$religião2)
-
 banco_reduzido = banco_reduzido %>%
   mutate(
     região3 = case_when(
@@ -136,7 +130,6 @@ banco_reduzido = banco_reduzido %>%
       região3==2     ~ "Metropolitana",
       região3==3     ~ "Interior"))
 table(banco_reduzido$região3)
-
 #----------------------------------------------------------------------
 banco_reduzido = banco_reduzido %>%
   mutate(
@@ -169,28 +162,20 @@ banco_reduzido = banco_reduzido %>%
       Q8==3     ~ "Nenhuma confiança"))
 table(banco_reduzido$Q8)
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+banco_reduzido = banco_reduzido %>%
+  mutate(
+    ideologia2 = case_when(
+      ideologia2==1     ~ "Esquerda",
+      ideologia2==2     ~ "Centro",
+      ideologia2==5     ~ "Direita",
+      ideologia2==96     ~ "Nenhuma"))
+table(banco_reduzido$ideologia2)
 
 #banco_reduzido = na.omit(banco_reduzido)
 # Tem que ser um data.frame para funcionar
 # Não pode ser um tibble nem um spss
 banco_reduzido = data.frame(banco_reduzido)
+
 # Calculate list experiment difference in means
 diff_medias <- ictreg(Q14_3 ~ 1, data = banco_reduzido, 
                       treat = "experimento2", J=4, method = "lm")
@@ -199,7 +184,7 @@ summary(diff_medias)
 aaa <- predict(diff_medias, newdata = as.data.frame(matrix(1, 1, 1)), se.fit = TRUE, 
                avg = TRUE)
 aaa
-
+remove(aaa,diff_medias,teste,teste2)
 #----------------------------------------------------------------------------------------
 # Fit linear regression
 modelo_social <- ictreg(Q14_3 ~ sexo + faixaidade2 +Raça2+
@@ -219,53 +204,84 @@ summary(modelo_social)
 #2*pnorm(1.785,lower.tail = FALSE) # (1-pnorm(1.785))*2
 
 # 2*Pr(ET>|−2.14/1.08|) = 2*Pr(ET>|-1.981481|)= 2*Pr(ET>1.981481)
+# 2*pnorm(1.96,lower.tail = FALSE)
 
 #ET = 2.14/1.08
 #2*pnorm(ET,lower.tail = FALSE)
 #2*pt(ET, df=20, lower.tail = FALSE, log.p = FALSE)
 
 
-
-
 # Fit two-step non-linear least squares regression
-nls_results <- ictreg(Q14_3 ~ sexo + faixaidade2 +Raça2+
+nls_modelo_social<- ictreg(Q14_3 ~ sexo + faixaidade2 +Raça2+
                         escolaridade2+renda2+religião2+região3,
                       data = banco_reduzido, 
                       treat = "experimento2", J=4, method = "nls")
-summary(nls_results)
+summary(nls_modelo_social)
 
 
 # Fit EM algorithm ML model with constraint
-ml.constrained.results <- ictreg(Q14_3 ~ sexo + faixaidade2 +Raça2+
-                         escolaridade2+renda2+religião2+região3,
-                         data = banco_reduzido, 
+ml_modelo_social <- ictreg(Q14_3 ~ sexo + faixaidade2 +Raça2+
+                                   escolaridade2+renda2+religião2+região3,
+                                 data = banco_reduzido, 
+                                 treat = "experimento2", J=4,
                                  overdispersed = FALSE, constrained = TRUE)
-summary(ml.constrained.results)
+summary(ml_modelo_social)
 # Fit EM algorithm ML model with no constraint
-ml.unconstrained.results <- ictreg(y ~ idade + as.factor(sexo)+educa+confia_urna+importância_voto+regiao+renda, data = banco_reduzido,  
-                                   treat = "treat", J=4, method = "ml", 
+ml_modelo_social2 <- ictreg(Q14_3 ~ sexo + faixaidade2 +Raça2+
+                                     escolaridade2+renda2+religião2+região3,
+                                   data = banco_reduzido, 
+                                   treat = "experimento2", J=4, method = "ml", 
                                    overdispersed = FALSE, constrained = FALSE)
-summary(ml.unconstrained.results)
+summary(ml_modelo_social)
 
 # Fit standard design ML model
-noboundary.results <- ictreg(y ~ idade + as.factor(sexo)+educa+confia_urna+importância_voto+regiao+renda, data = banco_reduzido,   
-                             treat = "treat",J = 4, method = "ml", 
+ml_modelo_social3 <- ictreg(Q14_3 ~ sexo + faixaidade2 +Raça2+
+                               escolaridade2+renda2+religião2+região3,
+                             data = banco_reduzido, 
+                             treat = "experimento2", J=4, method = "ml", 
                              overdispersed = FALSE)
 
-summary(noboundary.results)
+summary(ml_modelo_social3)
 
 # Robust models, which constrain sensitive item proportion
 #   to difference-in-means estimate
-robust.ml <- ictreg(
-  y ~ idade + as.factor(sexo)+educa+confia_urna+importância_voto+regiao+renda, data = banco_reduzido,  
-  treat = "treat",
-  J = 4, method = "ml", robust = TRUE)
-summary(robust.ml)
+robust_modelo_social <- ictreg(
+  Q14_3 ~ sexo + faixaidade2 +Raça2+
+    escolaridade2+renda2+religião2+região3,
+  data = banco_reduzido, 
+  treat = "experimento2", J=4, method = "ml", robust = TRUE)
+summary(robust_modelo_social)
 
-robust.nls <- ictreg(
-  y ~ idade + as.factor(sexo)+educa+confia_urna+importância_voto+regiao+renda, data = banco_reduzido,  
-  treat = "treat",
+robust_modelo_social2 <- ictreg(
+  Q14_3 ~ sexo + faixaidade2 +Raça2+
+    escolaridade2+renda2+religião2+região3,
+  data = banco_reduzido, 
+  treat = "experimento2",
   J = 4, method = "nls", robust = TRUE)
-summary(robust.nls)
+summary(robust_modelo_social2)
 
+
+#--------------------------------------------------------------------------------
+# Modelo com as variáveis políticas
+#--------------------------------------------------------------------------------
+
+modelo_pol <- ictreg(Q14_3 ~ ideologia2 + Q5 + Q7+ Q8,
+                        data = banco_reduzido, 
+                        treat = "experimento2", J=4, method = "lm")
+summary(modelo_pol)
+
+robust_modelo_pol2 <- ictreg(
+  Q14_3 ~ ideologia2 + Q5 + Q7+ Q8,
+  data = banco_reduzido, 
+  treat = "experimento2",
+  J = 4, method = "nls", robust = TRUE)
+summary(robust_modelo_pol2)
+
+#--------------------------------------------------------------------------------
+# Modelo completo
+#--------------------------------------------------------------------------------
+
+modelo_completo<- ictreg(Q14_3 ~ sexo + faixaidade2 +Raça2+ escolaridade2+renda2+religião2+região3 + ideologia2 + Q5 + Q7+ Q8,
+                     data = banco_reduzido, treat = "experimento2", J=4, method = "lm")
+summary(modelo_completo)
 

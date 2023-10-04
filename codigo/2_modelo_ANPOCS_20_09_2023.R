@@ -10,9 +10,9 @@ remove(dicionario)
 banco = banco %>% filter(ideologia2!=99)
 banco = banco %>% filter(Q8!=99)
 banco = banco %>% filter(Q7!=99)
-banco = banco %>% filter(Q7!=96)
+banco = banco %>% filter(Q6!=96)
 banco = banco %>% filter(Q5!=99)
-banco = banco %>% filter(ideologia2!=99)
+
 
 
 #-----------------------------------------------------------------------
@@ -56,12 +56,7 @@ haven::print_labels(banco$Q7)
 haven::print_labels(banco$Q8)
 haven::print_labels(banco$ideologia2)
 
-library(haven)
-haven::print_labels(banco$Q7)
-
-table(banco$Q7)
-# Contra = categoria de base
-# incluir a Q7 no gráfico
+table(banco$Q6)
 
 attributes(banco$Q6) 
 attributes(banco$Q7) 
@@ -138,8 +133,8 @@ table(banco_reduzido$Q5)
 banco_reduzido = banco_reduzido %>%
   mutate(
     Q6 = case_when(
-      Q6==1     ~ "A favor",
-      Q6==2     ~ "Contra" )) #,
+      Q6==1     ~ "2 A favor",
+      Q6==2     ~ "1 Contra" )) #,
       # Q6==3     ~ "Indiferente"))
 table(banco_reduzido$Q6)
 
@@ -174,7 +169,7 @@ banco_reduzido = data.frame(banco_reduzido)
 
 
 #----------------------------------------------------------------------------------------
-Calculate list experiment difference in means
+#Calculate list experiment difference in means
 diff_medias <- ictreg(Q14_3 ~ 1, data = banco_reduzido, 
                       treat = "experimento2", J=4, method = "lm")
 summary(diff_medias)

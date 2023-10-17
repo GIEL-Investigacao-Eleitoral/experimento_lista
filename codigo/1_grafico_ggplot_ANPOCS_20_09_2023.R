@@ -4,6 +4,7 @@ remove(dicionario)
 # Two-sample design
 #----------------------------------------------------------------------------------
 library(misty)
+library(dplyr)
 
 # Two-Sided 95% CI for y1 by group1
 # unknown population variances, unequal variance assumption
@@ -173,6 +174,7 @@ resultado_geral
 
 # Importância do voto (Q5)
 haven::print_labels(banco$Q5)
+attributes(banco$Q5)$label
 banco_q5 = banco %>% filter(Q5!=99)
 resultado_Q5 = ci.mean.diff(Q14_3 ~ experimento, data = banco_q5, digits = 3, na.omit = TRUE, group =banco_q5$Q5)
 resultado_Q5 = data.frame(resultado_Q5[["result"]][8],
@@ -187,6 +189,7 @@ remove(banco_q5,resultado_geral,resultado_Q5)
 
 # Voto Obrigatório (Q7) 
 haven::print_labels(banco$Q7)
+attributes(banco$Q7)
 table(banco$Q7)
 banco_q7 = banco %>% filter(Q7!=99)
 resultado_Q7 = ci.mean.diff(Q14_3 ~ experimento, data = banco_q7, digits = 3, na.omit = TRUE, group =banco_q7$Q7)
@@ -194,7 +197,7 @@ resultado_Q7 = data.frame(resultado_Q7[["result"]][8],
                           resultado_Q7[["result"]][9],
                           resultado_Q7[["result"]][10])
 resultado_Q7 = resultado_Q7[c(2,4),]
-resultado_Q7$categoria = c('104 Sim','105 Não')
+resultado_Q7$categoria = c('104 Votaria','105 Não votaria')
 resultado_Q7$x = 4:5
 resultado = resultado %>% add_row(resultado_Q7)
 remove(banco_q5,resultado_geral,resultado_Q5)
@@ -202,6 +205,8 @@ remove(banco_q7,resultado_Q7)
 
 # confiança na urna Q8
 haven::print_labels(banco$Q8)
+attributes(banco$Q8)
+
 table(banco$Q8)
 banco_q8 = banco %>% filter(Q8!=99)
 resultado_Q8 = ci.mean.diff(Q14_3 ~ experimento, data = banco_q8, digits = 3, na.omit = TRUE, group =banco_q8$Q8)

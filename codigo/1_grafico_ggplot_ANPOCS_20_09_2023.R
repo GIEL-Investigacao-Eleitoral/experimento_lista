@@ -141,6 +141,8 @@ resultado = resultado %>% add_row(resultado_região3)
 
 remove(resultado_região3,resultado_religião2)
 
+writexl::write_xlsx(resultado,path = "resultado_1.xlsx")
+
 
 
 ggplot(resultado, aes(x=categoria, y=m.diff, group=categoria,color=categoria,fill=categoria)) +
@@ -234,6 +236,8 @@ resultado_ideologia2$x = 9:12
 resultado = resultado %>% add_row(resultado_ideologia2)
 
 remove(banco_ideologia2,resultado_ideologia2)
+
+writexl::write_xlsx(resultado,path = "resultado_2.xlsx")
 
 
 ggplot(resultado, aes(x=categoria, y=m.diff, group=categoria,color=categoria,fill=categoria)) +

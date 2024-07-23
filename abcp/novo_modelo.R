@@ -24,7 +24,9 @@ library(dplyr)
 library(list)
 library(readxl)
 library(janitor)
-BD <- read_excel("H:/Meu Drive/backup/dasktop/pasta_pessoal/Borba_Vinicius_experimento_lista/BDconcatenado2.xlsx") %>% clean_names()
+#BD <- read_excel("H:/Meu Drive/backup/dasktop/pasta_pessoal/Borba_Vinicius_experimento_lista/BDconcatenado2.xlsx") %>% clean_names()
+BD <- read_excel("/home/steven/Downloads/Borba_Vinicius_experimento_lista/BDconcatenado2.xlsx") %>% clean_names()
+
 head(BD)
 
 # experimento
@@ -132,10 +134,14 @@ BD = BD %>%
       na_politica_as_pessoas_falam_muito_de_esquerda_e_direita_onde_o_a_sr_a_situaria_a_ideologia_do_partido_pelo_qual_voce_concorreu_na_eleicao_municipal_de_2020=="Esquerda" ~ "Esquerda", 
       TRUE                      ~ NA))
       
-table(BD$ideologia)
-         
+#table(BD$ideologia)
+#table(BD$na_sua_opiniao_as_eleicoes_para_prefeito_possuem_muita_fraude_pouca_fraude_ou_nenhuma_fraude)
 
-BD_reduzido = BD %>% select(ds_cargo,ds_sit_totalizacao,st_reeleicao,na_eleicao_municipal_de_2020_o_a_sr_a_foi_vitima_de_algum_tipo_de_violencia_por_causa_da_sua_atuacao_politica_como_candidato_a,na_politica_as_pessoas_falam_muito_de_esquerda_e_direita_onde_o_a_sr_a_situaria_a_ideologia_do_partido_pelo_qual_voce_concorreu_na_eleicao_municipal_de_2020,o_a_sr_a_e_a_favor_ou_contra_o_comprovante_impresso_do_voto,o_a_sr_a_diria_que_tem_muita_confianca_pouca_confianca_ou_nenhuma_confianca_na_urna_eletronica,o_a_sr_a_diria_que_tem_muita_confianca_pouca_confianca_ou_nenhuma_confianca_na_justica_eleitoral,no_brasil_o_voto_e_obrigatorio_o_a_sr_a_e_a_favor_ou_contra_o_voto_obrigatorio,sg_uf,ds_cor_raca,ds_grau_instrucao,nr_idade_data_posse,ds_genero, abaixo_ha_uma_lista_de_itens_com_criterios_que_os_eleitores_usam_para_escolher_o_seu_candidato_a_prefeito_a_com_quantos_desses_criterios_o_a_sr_a_concorda_nao_precisamos_saber_quais_estamos_interessados_apenas_na_quantidade_a_a_honestidade_e_o_preparo_para_o_cargo_do_candidato_b_as_propostas_de_governo_do_candidato_c_o_candidato_ser_a_indicacao_de_alguma_pessoa_de_confianca_do_eleitor_d_o_partido_politico_do_candidato_indique_abaixo_o_numero_de_itens_com_os_quais_o_a_sr_a_concorda_0_nenhum_1_2_3_ou_4,controle,regiao,fidade,cor_raca,ideologia,educa)
+BD$fraude = BD$na_sua_opiniao_as_eleicoes_para_prefeito_possuem_muita_fraude_pouca_fraude_ou_nenhuma_fraude
+BD$fraude = factor(BD$fraude,levels = c("Não sei informar","Nenhuma fraude","Pouca fraude","Muita fraude"))
+table(BD$fraude)
+
+BD_reduzido = BD %>% select(ds_cargo,ds_sit_totalizacao,st_reeleicao,na_eleicao_municipal_de_2020_o_a_sr_a_foi_vitima_de_algum_tipo_de_violencia_por_causa_da_sua_atuacao_politica_como_candidato_a,na_politica_as_pessoas_falam_muito_de_esquerda_e_direita_onde_o_a_sr_a_situaria_a_ideologia_do_partido_pelo_qual_voce_concorreu_na_eleicao_municipal_de_2020,o_a_sr_a_e_a_favor_ou_contra_o_comprovante_impresso_do_voto,o_a_sr_a_diria_que_tem_muita_confianca_pouca_confianca_ou_nenhuma_confianca_na_urna_eletronica,o_a_sr_a_diria_que_tem_muita_confianca_pouca_confianca_ou_nenhuma_confianca_na_justica_eleitoral,no_brasil_o_voto_e_obrigatorio_o_a_sr_a_e_a_favor_ou_contra_o_voto_obrigatorio,sg_uf,ds_cor_raca,ds_grau_instrucao,nr_idade_data_posse,ds_genero, abaixo_ha_uma_lista_de_itens_com_criterios_que_os_eleitores_usam_para_escolher_o_seu_candidato_a_prefeito_a_com_quantos_desses_criterios_o_a_sr_a_concorda_nao_precisamos_saber_quais_estamos_interessados_apenas_na_quantidade_a_a_honestidade_e_o_preparo_para_o_cargo_do_candidato_b_as_propostas_de_governo_do_candidato_c_o_candidato_ser_a_indicacao_de_alguma_pessoa_de_confianca_do_eleitor_d_o_partido_politico_do_candidato_indique_abaixo_o_numero_de_itens_com_os_quais_o_a_sr_a_concorda_0_nenhum_1_2_3_ou_4,controle,regiao,fidade,cor_raca,ideologia,educa,fraude)
 
 BD_reduzido = BD_reduzido %>% rename(resposta = abaixo_ha_uma_lista_de_itens_com_criterios_que_os_eleitores_usam_para_escolher_o_seu_candidato_a_prefeito_a_com_quantos_desses_criterios_o_a_sr_a_concorda_nao_precisamos_saber_quais_estamos_interessados_apenas_na_quantidade_a_a_honestidade_e_o_preparo_para_o_cargo_do_candidato_b_as_propostas_de_governo_do_candidato_c_o_candidato_ser_a_indicacao_de_alguma_pessoa_de_confianca_do_eleitor_d_o_partido_politico_do_candidato_indique_abaixo_o_numero_de_itens_com_os_quais_o_a_sr_a_concorda_0_nenhum_1_2_3_ou_4)
 BD_reduzido = BD_reduzido %>% rename(idade = nr_idade_data_posse)
@@ -181,8 +187,15 @@ BD_reduzido$resposta = as.numeric(BD_reduzido$resposta)
 BD_reduzido = BD_reduzido %>% filter(ds_cargo!="VICE-PREFEITO")
 class(BD_reduzido)
 BD_reduzido = data.frame(BD_reduzido)
-
 #BD_reduzido_v = BD_reduzido %>% filter(ds_cargo=='VEREADOR')
+
+#table(BD_reduzido$confia_urna)
+#table(BD_reduzido$confia_justica_eleitoral)
+#table(BD_reduzido$comprovante_impresso)
+
+BD_reduzido$confia_urna = factor(BD_reduzido$confia_urna, levels = c("Nenhuma confiança", "Pouca confiança","Muita confiança"))
+BD_reduzido$confia_justica_eleitoral = factor(BD_reduzido$confia_justica_eleitoral, levels = c("Nenhuma confiança", "Pouca confiança","Muita confiança"))
+BD_reduzido$comprovante_impresso = factor(BD_reduzido$comprovante_impresso, levels = c("Indiferente","A favor","Contra"))
 
 #----------------------------------------------------------------------------------------
 #Calculate list experiment difference in means
@@ -197,10 +210,12 @@ remove(aaa)
 
 # MODELO COMPLETO
 modelo <- ictreg(resposta ~ ds_genero+fidade+educa+cor_raca+regiao+
-                   voto_obrigatorio+confia_justica_eleitoral+confia_urna+comprovante_impresso+ideologia+vit_vio_eleitoral+ds_sit_totalizacao+ds_cargo, 
+                   voto_obrigatorio+confia_justica_eleitoral+confia_urna+comprovante_impresso+ideologia+vit_vio_eleitoral+ds_sit_totalizacao+ds_cargo+fraude, 
                  data = BD_reduzido, 
                       treat = "controle", J=4, method = "lm")
 
+resultado_modelo_completo = capture.output(summary(summary(modelo)))
+cat(resultado_modelo_completo,file="resultado_modelo_completo.txt",sep="\n",append=FALSE)
 
 
 summary(modelo)
@@ -213,7 +228,7 @@ summary(modelo2)
 
 
 # MODELO VARIÁVEIS POLITICAS
-modelo3 <- ictreg(resposta ~ voto_obrigatorio+confia_justica_eleitoral+confia_urna+comprovante_impresso+ideologia+vit_vio_eleitoral+ds_sit_totalizacao+ds_cargo, 
+modelo3 <- ictreg(resposta ~ voto_obrigatorio+confia_justica_eleitoral+confia_urna+comprovante_impresso+ideologia+vit_vio_eleitoral+ds_sit_totalizacao+ds_cargo+fraude, 
                  data = BD_reduzido, 
                  treat = "controle", J=4, method = "lm")
 
@@ -222,9 +237,10 @@ modelo3 <- ictreg(resposta ~ voto_obrigatorio+confia_justica_eleitoral+confia_ur
 summary(modelo3)
 
 
+resultado_modelo3 = capture.output(summary(summary(modelo3)))
+cat(resultado_modelo3,file="resultado_modelo3.txt",sep="\n",append=FALSE)
 
 list::ict.test(BD_reduzido$resposta,BD_reduzido$controle,J=4,gms = TRUE)
-
 
 
 
@@ -479,6 +495,18 @@ resultado_eleicao$x = 21:22
 resultado = resultado %>% add_row(resultado_eleicao)
 resultado
 
+
+# FRAUDE
+resultado_fraude = ci.mean.diff(resposta ~ controle, data = BD_reduzido , digits = 3, na.omit = TRUE, group =BD_reduzido$fraude)
+resultado_fraude = data.frame(resultado_fraude[["result"]][8],
+                              resultado_fraude[["result"]][9],
+                              resultado_fraude[["result"]][10])
+resultado_fraude = resultado_fraude[c(2,4,6,8),]
+resultado_fraude$categoria = c('171          Não sei informar','172          Nenhuma fraude', '173          Pouca fraude', '174          Muita fraude')
+resultado_fraude$x = 23:26
+resultado = resultado %>% add_row(resultado_fraude)
+resultado
+
 #writexl::write_xlsx(resultado,path = "resultado_2.xlsx")
 
 library(ggplot2)
@@ -486,8 +514,8 @@ ggplot(resultado, aes(x=categoria, y=m.diff, group=categoria,color=categoria,fil
   geom_pointrange(aes(ymin = low, y=m.diff ,ymax = upp),linewidth = 2,shape=21, size=1.5)+
   #geom_point(shape=21, size=5, fill='royalblue')+
   geom_hline(yintercept = 0,linetype='dashed', col = "#3f3f3f") +
-  scale_colour_manual(values = c("red",'blue','blue','blue','red','red','red','blue','blue','blue','red','red','red', 'blue','blue','blue', 'red','red','blue','blue','red','red')) +
-  scale_fill_manual(values = c('red','blue','blue','blue','red','red','red','blue','blue','blue','red','red','red', 'blue','blue','blue','red','red','blue','blue','red','red')) +
+  #scale_colour_manual(values = c("red",'blue','blue','blue','red','red','red','blue','blue','blue','red','red','red', 'blue','blue','blue', 'red','red','blue','blue','red','red','blue','blue','blue','blue')) +
+  #scale_fill_manual(values = c('red','blue','blue','blue','red','red','red','blue','blue','blue','red','red','red', 'blue','blue','blue','red','red','blue','blue','red','red','blue','blue','blue','blue')) +
   coord_flip()+
   theme_classic()+
   theme(legend.position="none")+

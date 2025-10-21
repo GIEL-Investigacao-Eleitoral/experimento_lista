@@ -24,8 +24,8 @@ library(dplyr)
 library(list)
 library(readxl)
 library(janitor)
-#BD <- read_excel("H:/Meu Drive/backup/dasktop/pasta_pessoal/Borba_Vinicius_experimento_lista/BDconcatenado2.xlsx") %>% clean_names()
-BD <- read_excel("/home/steven/Downloads/Borba_Vinicius_experimento_lista/BDconcatenado2.xlsx") %>% clean_names()
+BD <- read_excel("H:/Meu Drive/backup/dasktop/pasta_pessoal/Borba_Vinicius_experimento_lista/BDconcatenado2.xlsx") %>% clean_names()
+#BD <- read_excel("/home/steven/Downloads/Borba_Vinicius_experimento_lista/BDconcatenado2.xlsx") %>% clean_names()
 
 head(BD)
 
@@ -138,7 +138,7 @@ BD = BD %>%
 #table(BD$na_sua_opiniao_as_eleicoes_para_prefeito_possuem_muita_fraude_pouca_fraude_ou_nenhuma_fraude)
 
 BD$fraude = BD$na_sua_opiniao_as_eleicoes_para_prefeito_possuem_muita_fraude_pouca_fraude_ou_nenhuma_fraude
-BD$fraude = factor(BD$fraude,levels = c("Não sei informar","Nenhuma fraude","Pouca fraude","Muita fraude"))
+BD$fraude = factor(BD$fraude,levels = c("Nenhuma fraude","Não sei informar","Pouca fraude","Muita fraude"))
 table(BD$fraude)
 
 BD_reduzido = BD %>% select(ds_cargo,ds_sit_totalizacao,st_reeleicao,na_eleicao_municipal_de_2020_o_a_sr_a_foi_vitima_de_algum_tipo_de_violencia_por_causa_da_sua_atuacao_politica_como_candidato_a,na_politica_as_pessoas_falam_muito_de_esquerda_e_direita_onde_o_a_sr_a_situaria_a_ideologia_do_partido_pelo_qual_voce_concorreu_na_eleicao_municipal_de_2020,o_a_sr_a_e_a_favor_ou_contra_o_comprovante_impresso_do_voto,o_a_sr_a_diria_que_tem_muita_confianca_pouca_confianca_ou_nenhuma_confianca_na_urna_eletronica,o_a_sr_a_diria_que_tem_muita_confianca_pouca_confianca_ou_nenhuma_confianca_na_justica_eleitoral,no_brasil_o_voto_e_obrigatorio_o_a_sr_a_e_a_favor_ou_contra_o_voto_obrigatorio,sg_uf,ds_cor_raca,ds_grau_instrucao,nr_idade_data_posse,ds_genero, abaixo_ha_uma_lista_de_itens_com_criterios_que_os_eleitores_usam_para_escolher_o_seu_candidato_a_prefeito_a_com_quantos_desses_criterios_o_a_sr_a_concorda_nao_precisamos_saber_quais_estamos_interessados_apenas_na_quantidade_a_a_honestidade_e_o_preparo_para_o_cargo_do_candidato_b_as_propostas_de_governo_do_candidato_c_o_candidato_ser_a_indicacao_de_alguma_pessoa_de_confianca_do_eleitor_d_o_partido_politico_do_candidato_indique_abaixo_o_numero_de_itens_com_os_quais_o_a_sr_a_concorda_0_nenhum_1_2_3_ou_4,controle,regiao,fidade,cor_raca,ideologia,educa,fraude)
@@ -209,11 +209,11 @@ aaa
 remove(aaa)
 
 # MODELO COMPLETO
-modelo <- ictreg(resposta ~ ds_genero+fidade+educa+cor_raca+regiao+
-                   voto_obrigatorio+confia_justica_eleitoral+confia_urna+comprovante_impresso+ideologia+vit_vio_eleitoral+ds_sit_totalizacao+ds_cargo+fraude, 
+modelo <- ictreg(resposta ~ ds_genero+fidade+educa+cor_raca+regiao+ #voto_obrigatorio +vit_vio_eleitoral
+                   confia_justica_eleitoral+confia_urna+comprovante_impresso+ideologia+ds_sit_totalizacao+ds_cargo+fraude, 
                  data = BD_reduzido, 
                       treat = "controle", J=4, method = "lm")
-
+summary(modelo)
 resultado_modelo_completo = capture.output(summary(summary(modelo)))
 cat(resultado_modelo_completo,file="resultado_modelo_completo.txt",sep="\n",append=FALSE)
 
@@ -228,7 +228,8 @@ summary(modelo2)
 
 
 # MODELO VARIÁVEIS POLITICAS
-modelo3 <- ictreg(resposta ~ voto_obrigatorio+confia_justica_eleitoral+confia_urna+comprovante_impresso+ideologia+vit_vio_eleitoral+ds_sit_totalizacao+ds_cargo+fraude, 
+modelo3 <- ictreg(resposta ~ confia_urna+comprovante_impresso+ideologia+confia_justica_eleitoral+ds_sit_totalizacao+ds_cargo+fraude,
+                    #voto_obrigatorio+vit_vio_eleitoral, 
                  data = BD_reduzido, 
                  treat = "controle", J=4, method = "lm")
 
@@ -386,19 +387,19 @@ resultado_geral = data.frame(resultado_geral[["result"]][7],
 resultado_geral = resultado_geral[2,]
 resultado_geral$categoria = '100            Global'
 resultado_geral$x = 0
-resultado_geral
+resultado = resultado_geral
 
 #Variáveis Políticas
 #Voto obrigatório
-resultado_VO = ci.mean.diff(resposta ~ controle, data = BD_reduzido, digits = 3, na.omit = TRUE, group =BD_reduzido$voto_obrigatorio)
-resultado_VO = data.frame(resultado_VO[["result"]][8],
-                          resultado_VO[["result"]][9],
-                          resultado_VO[["result"]][10])
-resultado_VO = resultado_VO[c(2,4,6),]
-resultado_VO$categoria = c('101           A favor','103            Contra','102       Indiferente')
-resultado_VO$x = 1:3
-resultado = resultado_geral %>% add_row(resultado_VO)
-remove(resultado_VO,resultado_geral)
+# resultado_VO = ci.mean.diff(resposta ~ controle, data = BD_reduzido, digits = 3, na.omit = TRUE, group =BD_reduzido$voto_obrigatorio)
+# resultado_VO = data.frame(resultado_VO[["result"]][8],
+#                           resultado_VO[["result"]][9],
+#                           resultado_VO[["result"]][10])
+# resultado_VO = resultado_VO[c(2,4,6),]
+# resultado_VO$categoria = c('101           A favor','103            Contra','102       Indiferente')
+# resultado_VO$x = 1:3
+# resultado = resultado_geral %>% add_row(resultado_VO)
+# remove(resultado_VO,resultado_geral)
 
 
 #Confiança na urna
@@ -457,16 +458,16 @@ remove(resultado_civ)
 
 
 #Vitima de violência política (sim, não)
-resultado_vp = ci.mean.diff(resposta ~ controle, data = BD_reduzido , digits = 3, na.omit = TRUE, group =BD_reduzido$vit_vio_eleitoral)
-resultado_vp = data.frame(resultado_vp[["result"]][8],
-                           resultado_vp[["result"]][9],
-                           resultado_vp[["result"]][10])
-resultado_vp = resultado_vp[c(2,4),]
-resultado_vp$categoria = c('141               Não','142               Sim')
-resultado_vp$x = 17:18
-resultado = resultado %>% add_row(resultado_vp)
-resultado
-remove(resultado_vp)
+# resultado_vp = ci.mean.diff(resposta ~ controle, data = BD_reduzido , digits = 3, na.omit = TRUE, group =BD_reduzido$vit_vio_eleitoral)
+# resultado_vp = data.frame(resultado_vp[["result"]][8],
+#                            resultado_vp[["result"]][9],
+#                            resultado_vp[["result"]][10])
+# resultado_vp = resultado_vp[c(2,4),]
+# resultado_vp$categoria = c('141               Não','142               Sim')
+# resultado_vp$x = 17:18
+# resultado = resultado %>% add_row(resultado_vp)
+# resultado
+# remove(resultado_vp)
 
 #Eleito / não eleito
 
@@ -514,14 +515,14 @@ ggplot(resultado, aes(x=categoria, y=m.diff, group=categoria,color=categoria,fil
   geom_pointrange(aes(ymin = low, y=m.diff ,ymax = upp),linewidth = 2,shape=21, size=1.5)+
   #geom_point(shape=21, size=5, fill='royalblue')+
   geom_hline(yintercept = 0,linetype='dashed', col = "#3f3f3f") +
-  #scale_colour_manual(values = c("red",'blue','blue','blue','red','red','red','blue','blue','blue','red','red','red', 'blue','blue','blue', 'red','red','blue','blue','red','red','blue','blue','blue','blue')) +
-  #scale_fill_manual(values = c('red','blue','blue','blue','red','red','red','blue','blue','blue','red','red','red', 'blue','blue','blue','red','red','blue','blue','red','red','blue','blue','blue','blue')) +
+  scale_colour_manual(values = c('blue','red','red','red','blue','blue','blue','red','red','red', 'blue','blue','blue', 'red','red','blue','blue','red','red','red','red')) +
+  scale_fill_manual(values = c('blue','red','red','red','blue','blue','blue','red','red','red', 'blue','blue','blue','red','red','blue','blue','red','red','red','red')) +
   coord_flip()+
   theme_classic()+
   theme(legend.position="none")+
   labs(y='Diferença entre as médias',x='')
 
-ggsave("C:/Users/08451589707/Documents/GitHub/experimento_lista/abcp/grafico2_politicas.png",
+ggsave("C:/Users/08451589707/Documents/GitHub/experimento_lista/abcp/grafico2_politicas_v4.png",
        width = 17,
        height = 17,
        units = "cm",dpi = 300)
